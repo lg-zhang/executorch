@@ -10,8 +10,30 @@ from enum import Enum
 import torch
 import torch.nn as nn
 from executorch.examples.models.llama.llama_transformer import KVCache
+
+from executorch.extension.llm.custom_ops import custom_ops  # noqa: F401
 from torch.ao.quantization.fx._decomposed import quantized_decomposed_lib  # noqa: F401
 
+
+try:
+    op = torch.ops.quantized_decomposed.quantize_per_token.out
+    assert op is not None
+except:
+    import glob
+
+    import executorch
+
+    executorch_package_path = executorch.__path__[0]
+    libs = list(
+        glob.glob(
+            f"{executorch_package_path}/**/libquantized_ops_aot_lib.*", recursive=True
+        )
+    )
+    assert len(libs) == 1, f"Expected 1 library but got {len(libs)}"
+    logging.info(f"Loading custom ops library: {libs[0]}")
+    torch.ops.load_library(libs[0])
+    op = torch.ops.quantized_decomposed.quantize_per_token.out
+    assert op is not None
 
 """
  Heavily "inspired" by AO's implementation of the same in torchao/_models/llama/model.py

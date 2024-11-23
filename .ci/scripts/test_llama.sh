@@ -100,6 +100,12 @@ else
   COREML=OFF
 fi
 
+if [[ "${MODE}" =~ .*quantize_kv.* ]]; then
+  QUANTIZE_KV_CACHE=ON
+else
+  QUANTIZE_KV_CACHE=OFF
+fi
+
 echo "COREML option ${COREML}"
 
 if [[ "${MODE}" =~ .*qnn.* ]]; then
@@ -233,6 +239,9 @@ if [[ "${COREML}" == "ON" ]]; then
 fi
 if [[ "${QNN}" == "ON" ]]; then
   EXPORT_ARGS="${EXPORT_ARGS} -kv -v --qnn --disable_dynamic_shape"
+fi
+if [[ "${QUANTIZE_KV_CACHE}" == "ON" ]]; then
+  EXPORT_ARGS="${EXPORT_ARGS} --quantize_kv_cache"
 fi
 # Add dynamically linked library location
 $PYTHON_EXECUTABLE -m examples.models.llama.export_llama ${EXPORT_ARGS}
