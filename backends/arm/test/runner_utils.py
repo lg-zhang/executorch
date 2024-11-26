@@ -16,9 +16,9 @@ from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import torch
+import tosa_reference_model
 
 from executorch.backends.arm.test.common import arm_test_options, is_option_enabled
-import tosa_reference_model
 
 from torch.export import ExportedProgram
 from torch.fx.node import Node
